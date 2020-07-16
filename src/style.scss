@@ -1,0 +1,247 @@
+// CSS Reset
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+$font: 'Montserrat', sans-serif;
+$primary-color: rgb(35,38,42);
+$secondary-color: rgb(31,34,37);
+$tertiary-color: rgb(45,48,51);
+
+html {
+    font-size: 62.5%;
+    font-family: $font;
+    color: white;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 25rem 1fr;
+}
+
+// Sidebar
+.sidebar {
+    background: $secondary-color;
+    height: 100vh;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 3.2rem auto;
+}
+
+.sidebar__title {
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+
+    & > div {
+        margin-left: 1rem;
+    }
+    
+}
+
+.sidebar__list {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-left: 1rem;
+}
+
+.sidebar__list div {
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+
+    &:hover {
+        background-color: #ff007652;
+       
+    }
+}
+
+.sidebar__addProject {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        background-color: $secondary-color !important; 
+    }
+}
+
+.sidebar__addProject--text {
+    background-color: $secondary-color;
+    border: none;
+    outline: none;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    color: white;
+    border-bottom: 2px solid transparent;
+    
+    &:focus {
+        border-bottom: 2px solid #ff007652;
+    }
+}
+
+.sidebar__addProjectBtn {
+    font-size: 2rem;
+}
+
+// Todo-list
+.right-container {
+    background: $primary-color;
+    height: 100vh;
+    padding: 3rem 10rem;
+}
+
+.project-title {
+    font-size: 2.7rem;
+    display: flex;
+    align-items: center;
+
+    svg {
+        fill: yellow;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    div {
+        margin-left: 5px;
+        padding-top: 2px;
+    }
+}
+
+.todo-list {
+    margin-top: 5rem;
+}
+
+.todo {
+    border-radius: 3px;
+    transition: padding .3s ease, margin .3s ease;
+    user-select: none;
+}
+
+.todo__default {
+    display: flex;
+    align-items: center;
+    padding: .5rem;
+    border-radius: 3px;
+    z-index: 10;
+
+    &:hover {
+        background-color: rgb(38,66,114);
+    }
+}
+
+.todo__checkbox {
+    width: 1.3rem;
+    height: 1.3rem;
+    border: 1px solid rgb(107, 109, 112);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+}
+
+.todo__checkbox::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: -5px;
+    left: -4px;
+    background: url(../dist/images/check-icon.svg);
+    visibility: hidden;
+}
+
+.todo__title {
+    margin-left: 1rem;
+    font-size: 1.5rem;
+    background-color: inherit;
+    border: none;
+    color: white;
+    outline: none;
+    cursor: default;
+    position: relative;
+} 
+
+.todo__deleteBtn {
+    background: url(../dist/images/trash-icon.svg) no-repeat;
+    background-size: contain;
+    border: none;
+    outline: none;
+    height: 1.7rem;
+    transform: translateX(2rem); 
+    padding-right: 1.7rem;
+    opacity: 0;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.todo__default:not(.expanded):hover  .todo__deleteBtn,
+.todo__deleteBtn:hover {
+    transform: translateX(0);
+    transition: .3s ease;
+    opacity: 1;
+}
+
+.todo__expand {
+    padding: .5rem;
+    margin-left: 2.4rem;
+    display: none;
+}
+
+// Todo - Expanded
+.todo.expanded {
+    padding: 1rem 0;
+    margin: 3rem 0;
+    background-color: $tertiary-color;
+    box-shadow: 0px 3px 10px 2px rgba($color: #000000, $alpha: 0.3);
+    transition: padding .3s ease, margin .3s ease;
+}
+
+.todo__default.expanded {
+    user-select: none;
+    &:hover {
+        background-color: $tertiary-color;
+    }
+}
+
+.todo__default.expanded .todo__title {
+    cursor: text;
+    width: 100%;
+}
+
+.todo__default.expanded .todo__deleteBtn {
+    margin-left: 0;
+}
+
+.todo__default.expanded + .todo__expand {
+    display: block;
+}
+
+.todo__notes {
+    color: white;
+    font-size: 1.4rem;
+    background-color: $tertiary-color;
+    border: none;
+    resize: none;
+    width: 100%;
+    height: 4rem;
+    font-family: $font;
+    outline: none;
+}
+
+// Todo - checked
+.todo__checkbox.checked::before {
+    visibility: visible;
+}
+
+.todo__title.checked {
+    text-decoration: line-through;
+    color: rgb(145, 147, 149);
+}
