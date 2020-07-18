@@ -18,37 +18,53 @@ let todos = [
   }
 ]
 
-const addListeners = () => {
-  addExpandListenerToTodo();
-  addCollapseListenerToTodo();
-  addTodoTitleInputListener();
-  addTodoNotesInputListener();
-  addCheckboxListener();
-  addListenerToDeleteTodoBtns();
+
+const initListeners = () => {
+  todoListClickHandler();
+  todoListDoubleClickHandler();
+  todoListInputHandler();
   autoResizeNotes();
+  addCollapseListenerToTodo();
+}
+
+// To-Do list event delegation
+const todoListClickHandler = () => {
+  const todoList = document.getElementById('todo-list');
+  todoList.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('todo__checkbox')) {
+      toggleCheckedState(e);
+    } else if (target.classList.contains('todo__deleteBtn')) {
+      deleteTodo(e);
+    }
+  })
+}
+
+const todoListDoubleClickHandler = () => {
+  const todoList = document.getElementById('todo-list');
+  todoList.addEventListener('dblclick', (e) => {
+    const target = e.target;
+    if (target.classList.contains('todo__title') || target.classList.contains('todo__default')) {
+      expandTodo(e);
+    } 
+  })
+}
+
+const todoListInputHandler = () => {
+  const todoList = document.getElementById('todo-list');
+  todoList.addEventListener('input', (e) => {
+    const target = e.target;
+    const targetTodo = getTargetTodo(e);
+
+    if (target.classList.contains('todo__title')) {
+      targetTodo.title = target.value;
+    } else if (target.classList.contains('todo__notes')) {
+      targetTodo.notes = target.value;
+    }
+  })
 }
 
 // Input Listeners
-const addTodoTitleInputListener = () => {
-  const todoTitles = Array.from(document.querySelectorAll('.todo__title'));
-  todoTitles.map((todoTitle) => {
-    todoTitle.addEventListener('input', (e) => {
-      const targetTodo = getTargetTodo(e);
-      targetTodo.title = e.target.value;
-    });
-  })
-}
-
-const addTodoNotesInputListener = () => {
-  const todoNotes = Array.from(document.querySelectorAll('.todo__notes'));
-  todoNotes.map((todoNote) => {
-    todoNote.addEventListener('input', (e) => {
-      const targetTodo = getTargetTodo(e);
-      targetTodo.notes = e.target.value;
-    });
-  })
-}
-
 const getTargetTodo = (e) => {
   const todoid = e.target.dataset.todoid;
   const targetTodo = todos.find((todo) => todo.todoid === todoid);
@@ -63,7 +79,6 @@ const addListenerToAddTodoBtn = () => {
     const newTodoObject = todoFactory();
     todos.push(newTodoObject);
     renderTodo(newTodoObject);
-    addListeners();
   })
 }
 
@@ -78,13 +93,6 @@ const todoFactory = () => ({
 })
 
 // Delete To-Do button 
-const addListenerToDeleteTodoBtns = () => {
-  const deleteTodoBtns = Array.from(document.querySelectorAll('.todo__deleteBtn'));
-  deleteTodoBtns.map((deleteTodoBtn) => {
-    deleteTodoBtn.addEventListener('click', deleteTodo);
-  })
-}
-
 const deleteTodo = (e) => {
   const targetTodo = getTargetTodo(e);
   const toBeDeleted = e.target.closest('.todo');
@@ -116,11 +124,11 @@ const renderAllTodos = (todos) => {
 
 // Auto resize notes based on line break
 const autoResizeNotes = () => {
-  const textareas = Array.from(document.querySelectorAll(".resize-ta"));
-  textareas.map(textarea => {
-    textarea.addEventListener("keyup", () => {
-      textarea.style.height = calcHeight(textarea.value) + "px";
-    });
+  const todoList = document.getElementById('todo-list');
+  todoList.addEventListener('keyup', (e) => {
+    if (e.target.classList.contains('resize-ta')) {
+      e.target.style.height = calcHeight(e.target.value) + "px";
+    }
   })
 };
 
@@ -132,21 +140,12 @@ const calcHeight = (value) => {
 }
 
 // Define actions when double click on todo (expand)
-const addExpandListenerToTodo = () => {
-  const todoTitles = Array.from(document.querySelectorAll('.todo__default'));
-  todoTitles.map(todoTitle => {
-    todoTitle.addEventListener('dblclick', expandTodo);
-  })
-}
-
 const expandTodo = (e) => {
   const target = e.target;
   // If double click on checkbox or deleteBtn, don't expand todo
   const clickedCheckbox = target.classList.contains('todo__checkbox');
   const clickedDeleteBtn = target.classList.contains('todo__deleteBtn');
-  if (clickedCheckbox || clickedDeleteBtn) {
-    return;
-  }
+  if (clickedCheckbox || clickedDeleteBtn) return;
 
   target.closest('.todo').classList.add('expanded');
   document.querySelector('.todo.expanded .todo__title').removeAttribute('readonly');
@@ -171,11 +170,9 @@ const addCollapseListenerToTodo = () => {
 }
 
 // Define actions when clicked on checkbox
-const addCheckboxListener = () => {
-  const checkboxes = Array.from(document.querySelectorAll('.todo__checkbox'));
-  checkboxes.map((checkbox) => {
-    checkbox.addEventListener('click', toggleCheckedState);
-  })
+const toggleCheckedState = (e) => {
+  const checkedState = e.target.classList.contains('checked');
+  checkedState ? removeCheckedState(e) : addCheckedState(e);
 }
 
 const addCheckedState = (e) => {
@@ -190,12 +187,9 @@ const removeCheckedState =  (e) => {
   target.nextElementSibling.classList.remove('checked');
 }
 
-const toggleCheckedState = (e) => {
-  const checkedState = e.target.classList.contains('checked');
-  checkedState ? removeCheckedState(e) : addCheckedState(e);
-}
+
 
 // Set current project
 
 renderAllTodos(todos);
-addListeners();
+initListeners();
