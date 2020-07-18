@@ -21,6 +21,10 @@ html {
     color: white;
 }
 
+input {
+    font-family: $font;
+}
+
 .container {
     display: grid;
     grid-template-columns: 25rem 1fr;
@@ -52,6 +56,8 @@ html {
     font-size: 1.5rem;
     margin-top: 2rem;
     margin-left: 1rem;
+    grid-row: 2/3;
+    grid-column: 2/3;
 }
 
 .sidebar__list div {
@@ -99,8 +105,8 @@ html {
     padding: 3rem 10rem;
 }
 
-.project-title {
-    font-size: 2.7rem;
+// Header
+.header {
     display: flex;
     align-items: center;
 
@@ -109,11 +115,25 @@ html {
         width: 2.5rem;
         height: 2.5rem;
     }
+}
 
-    div {
-        margin-left: 5px;
-        padding-top: 2px;
-    }
+.project-title {
+    font-size: 2.7rem;
+    display: flex;
+    align-items: center;
+    margin-left: 5px;
+    padding-top: 2px;
+}
+
+.addTodoBtn {
+    margin-left: auto;
+    outline: none;
+    border: none;
+    color: white;
+    background-color: inherit;
+    position: relative;
+    font-size: 4rem;
+    cursor: pointer;
 }
 
 .todo-list {
@@ -167,6 +187,7 @@ html {
     outline: none;
     cursor: default;
     position: relative;
+    width: 100%;
 } 
 
 .todo__deleteBtn {
@@ -179,10 +200,10 @@ html {
     padding-right: 1.7rem;
     opacity: 0;
     cursor: pointer;
-    margin-left: auto;
+    transition: .3s ease-out;
 }
 
-.todo__default:not(.expanded):hover  .todo__deleteBtn,
+.todo:not(.expanded):hover  .todo__deleteBtn,
 .todo__deleteBtn:hover {
     transform: translateX(0);
     transition: .3s ease;
@@ -204,23 +225,18 @@ html {
     transition: padding .3s ease, margin .3s ease;
 }
 
-.todo__default.expanded {
+.todo.expanded .todo__default {
     user-select: none;
     &:hover {
         background-color: $tertiary-color;
     }
 }
 
-.todo__default.expanded .todo__title {
+.todo.expanded .todo__title {
     cursor: text;
-    width: 100%;
 }
 
-.todo__default.expanded .todo__deleteBtn {
-    margin-left: 0;
-}
-
-.todo__default.expanded + .todo__expand {
+.todo.expanded > .todo__expand {
     display: block;
 }
 

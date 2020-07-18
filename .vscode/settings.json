@@ -1,5 +1,11 @@
 {
     "cSpell.ignoreWords": [
-        "textareas"
+        "btns",
+        "delete",
+        "delete todo btns",
+        "textareas",
+        "todo",
+        "todoid",
+        "todos"
     ]
 }
