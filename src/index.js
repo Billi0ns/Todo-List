@@ -1,20 +1,43 @@
 import "./style.scss";
 
-let globalTodoIndex = 3;
+let globalTodoIndex = 4;
 let todos = [
   {
     title: 'Buy milk on my way home',
     notes: 'One litter of milk',
     checkedState: '',
     todoid: '1',
-    project: 'default',
+    notesHeight: '40px',
+    project: 'Default',
   },
   {
     title: 'Drink milk',
     notes: 'Drink a glass of milk',
     checkedState: 'checked',
     todoid: '2',
-    project: 'default',
+    notesHeight: '40px',
+    project: 'Default',
+  },
+  {
+    title: 'Welcome to this To-Do list app',
+    notes: '',
+    checkedState: '',
+    todoid: '3',
+    notesHeight: '40px',
+    project: 'Welcome',
+  }
+]
+
+let projects = [
+  {
+    title: 'Default',
+    projectid: '1',
+    selectState: 'selected-project',
+  },
+  {
+    title: 'Welcome',
+    projectid: '2',
+    selectState: '',
   }
 ]
 
@@ -25,6 +48,7 @@ const initListeners = () => {
   todoListInputHandler();
   autoResizeNotes();
   addCollapseListenerToTodo();
+  sidebarClickHandler();
 }
 
 // To-Do list event delegation
@@ -64,14 +88,25 @@ const todoListInputHandler = () => {
   })
 }
 
-// Input Listeners
+// Get target object
 const getTargetTodo = (e) => {
   const todoid = e.target.dataset.todoid;
   const targetTodo = todos.find((todo) => todo.todoid === todoid);
   return targetTodo;
 }
 
-// Add To-Do button
+const getTargetProject = (e) => {
+  let projectid;
+  if (e.target) {
+    projectid = e.target.dataset.projectid;
+  } else {
+    projectid = e.dataset.projectid;
+  }
+  const targetProject = projects.find((project) => project.projectid === projectid);
+  return targetProject;
+}
+
+// Add To-Do 
 const addListenerToAddTodoBtn = () => {
   const addTodoBtn = document.querySelector('.addTodoBtn');
   addTodoBtn.addEventListener('click', (e) => {
@@ -89,10 +124,11 @@ const todoFactory = () => ({
   notes: '',
   checkedState: '',
   todoid: `${globalTodoIndex}`,
+  notesHeight: '40px',
   project: document.querySelector('.project-title').textContent,
 })
 
-// Delete To-Do button 
+// Delete To-Do
 const deleteTodo = (e) => {
   const targetTodo = getTargetTodo(e);
   const toBeDeleted = e.target.closest('.todo');
@@ -107,12 +143,12 @@ const renderTodo = (todo) => {
   const todoHTML = `
   <div class="todo">
       <div class="todo__default">
-          <div class="todo__checkbox ${todo.checkedState}"></div>
+          <div class="todo__checkbox ${todo.checkedState}" data-todoid="${todo.todoid}"></div>
           <input type="text" value="${todo.title}" class="todo__title ${todo.checkedState}" data-todoid="${todo.todoid}" placeholder="New To-Do" readonly ></input>
           <button class="todo__deleteBtn" data-todoid="${todo.todoid}"></button>
       </div>
       <div class="todo__expand">
-          <textarea class="todo__notes resize-ta" placeholder="Notes" data-todoid="${todo.todoid}">${todo.notes}</textarea>
+          <textarea class="todo__notes resize-ta" placeholder="Notes" data-todoid="${todo.todoid}" style="height: ${todo.notesHeight};">${todo.notes}</textarea>
       </div>
   </div>`;
   todoList.insertAdjacentHTML('beforeend', todoHTML);
@@ -122,12 +158,37 @@ const renderAllTodos = (todos) => {
   todos.map((todo) => renderTodo(todo));
 }
 
+// Render projects
+const renderProject = (project) => {
+  const addProject = document.getElementById('sidebar__addProject');
+  const projectHTML = `
+  <div class="sidebar__item ${project.selectState}" data-projectid="${project.projectid}">
+      <div>${project.title}</div>
+      <button class="todo__deleteBtn"></button>
+  </div>`;
+
+  addProject.insertAdjacentHTML('beforebegin', projectHTML);
+}
+
+const renderAllProjects = (projects) => {
+  projects.map((project) => renderProject(project));
+}
+
+const filterProjectTodos = (selectedProjectTitle) => {
+  const targetTodos = todos.filter((todo) => todo.project === selectedProjectTitle);
+  return targetTodos;
+}
+
 // Auto resize notes based on line break
 const autoResizeNotes = () => {
   const todoList = document.getElementById('todo-list');
   todoList.addEventListener('keyup', (e) => {
     if (e.target.classList.contains('resize-ta')) {
-      e.target.style.height = calcHeight(e.target.value) + "px";
+      const targetTodo = getTargetTodo(e);
+      const notesHeight = calcHeight(e.target.value) + 'px';
+
+      targetTodo.notesHeight = notesHeight;
+      e.target.style.height = notesHeight;
     }
   })
 };
@@ -171,8 +232,16 @@ const addCollapseListenerToTodo = () => {
 
 // Define actions when clicked on checkbox
 const toggleCheckedState = (e) => {
+  const targetTodo = getTargetTodo(e);
   const checkedState = e.target.classList.contains('checked');
-  checkedState ? removeCheckedState(e) : addCheckedState(e);
+
+  if (checkedState) {
+    removeCheckedState(e);
+    targetTodo.checkedState = '';
+  } else {
+    addCheckedState(e);
+    targetTodo.checkedState = 'checked';
+  }
 }
 
 const addCheckedState = (e) => {
@@ -187,9 +256,58 @@ const removeCheckedState =  (e) => {
   target.nextElementSibling.classList.remove('checked');
 }
 
-
-
 // Set current project
+const sidebarClickHandler = () => {
+  const sidebar = document.getElementById('sidebar__list');
+  sidebar.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('sidebar__item') && !target.classList.contains('sidebar__addProject')) {
+      setCurrentProject(e);
+    } else if (target.classList.contains('todo__deleteBtn')) {
+      deleteProject(e);
+    }
+
+    
+  })
+}
+
+const setCurrentProject = (e) => {
+  const selectedProjectTitle = e.target.firstElementChild.textContent;
+  const projectFilteredTodos = filterProjectTodos(selectedProjectTitle);
+
+  selectProject(e);
+  document.getElementById('project-title').textContent = selectedProjectTitle;
+  removeAllTodoListItems();
+  renderAllTodos(projectFilteredTodos);
+}
+
+const selectProject = (e) => {
+  const target = e.target;
+  const targetProject = getTargetProject(e);
+  const previousSelectedProject = document.querySelector('.selected-project');
+  const previousSelectedTargetProject = getTargetProject(previousSelectedProject);
+  
+  if (target === previousSelectedProject) return;
+  
+  previousSelectedProject.classList.remove('selected-project');
+  previousSelectedTargetProject.selectState = ''; 
+  target.classList.add('selected-project');
+  targetProject.selectState = 'selected-project';
+}
+
+const removeAllTodoListItems = () => {
+  const todoList = document.getElementById('todo-list');
+  while (todoList.firstChild) {
+    todoList.removeChild(todoList.firstChild);
+  }
+}
+
+// Delete project 
+const deleteProject = (e) => {
+  e.target.closest('.sidebar__item').remove();
+  //console.log(e.target.closest('.sidebar__item'));
+}
 
 renderAllTodos(todos);
+renderAllProjects(projects);
 initListeners();
