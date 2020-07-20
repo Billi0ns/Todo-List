@@ -1,6 +1,8 @@
 import "./style.scss";
 
 let globalTodoIndex = 4;
+let globalProjectIndex = 4;
+
 let todos = [
   {
     title: 'Buy milk on my way home',
@@ -58,7 +60,7 @@ const todoListClickHandler = () => {
     const target = e.target;
     if (target.classList.contains('todo__checkbox')) {
       toggleCheckedState(e);
-    } else if (target.classList.contains('todo__deleteBtn')) {
+    } else if (target.classList.contains('deleteBtn')) {
       deleteTodo(e);
     }
   })
@@ -119,6 +121,7 @@ const addListenerToAddTodoBtn = () => {
 
 addListenerToAddTodoBtn();
 
+// Factories
 const todoFactory = () => ({
   title: '',
   notes: '',
@@ -126,6 +129,12 @@ const todoFactory = () => ({
   todoid: `${globalTodoIndex}`,
   notesHeight: '40px',
   project: document.querySelector('.project-title').textContent,
+})
+
+const projectFactory = (projectTitle) => ({
+  title: projectTitle,
+  projectid: `${globalProjectIndex}`,
+  selectedState: '',
 })
 
 // Delete To-Do
@@ -145,7 +154,7 @@ const renderTodo = (todo) => {
       <div class="todo__default">
           <div class="todo__checkbox ${todo.checkedState}" data-todoid="${todo.todoid}"></div>
           <input type="text" value="${todo.title}" class="todo__title ${todo.checkedState}" data-todoid="${todo.todoid}" placeholder="New To-Do" readonly ></input>
-          <button class="todo__deleteBtn" data-todoid="${todo.todoid}"></button>
+          <button class="deleteBtn" data-todoid="${todo.todoid}"></button>
       </div>
       <div class="todo__expand">
           <textarea class="todo__notes resize-ta" placeholder="Notes" data-todoid="${todo.todoid}" style="height: ${todo.notesHeight};">${todo.notes}</textarea>
@@ -164,7 +173,7 @@ const renderProject = (project) => {
   const projectHTML = `
   <div class="sidebar__item ${project.selectState}" data-projectid="${project.projectid}">
       <div>${project.title}</div>
-      <button class="todo__deleteBtn"></button>
+      <button class="deleteBtn" data-projectid="${project.projectid}"></button>
   </div>`;
 
   addProject.insertAdjacentHTML('beforebegin', projectHTML);
@@ -205,7 +214,7 @@ const expandTodo = (e) => {
   const target = e.target;
   // If double click on checkbox or deleteBtn, don't expand todo
   const clickedCheckbox = target.classList.contains('todo__checkbox');
-  const clickedDeleteBtn = target.classList.contains('todo__deleteBtn');
+  const clickedDeleteBtn = target.classList.contains('deleteBtn');
   if (clickedCheckbox || clickedDeleteBtn) return;
 
   target.closest('.todo').classList.add('expanded');
@@ -263,17 +272,18 @@ const sidebarClickHandler = () => {
     const target = e.target;
     if (target.classList.contains('sidebar__item') && !target.classList.contains('sidebar__addProject')) {
       setCurrentProject(e);
-    } else if (target.classList.contains('todo__deleteBtn')) {
+    } else if (target.classList.contains('deleteBtn')) {
       deleteProject(e);
+    } else if (target.classList.contains('sidebar__addProjectBtn')) {
+      addProject(e);
     }
-
-    
   })
 }
 
 const setCurrentProject = (e) => {
   const selectedProjectTitle = e.target.firstElementChild.textContent;
   const projectFilteredTodos = filterProjectTodos(selectedProjectTitle);
+  console.log(selectedProjectTitle)
 
   selectProject(e);
   document.getElementById('project-title').textContent = selectedProjectTitle;
@@ -304,9 +314,29 @@ const removeAllTodoListItems = () => {
 
 // Delete project 
 const deleteProject = (e) => {
-  e.target.closest('.sidebar__item').remove();
-  //console.log(e.target.closest('.sidebar__item'));
+  if (confirm('Are you sure you want to delete this project?')) {
+    const selectedProjectTitle = e.target.previousElementSibling.textContent;
+    const toBeDeletedTodos = filterProjectTodos(selectedProjectTitle);
+    const targetProject = getTargetProject(e);
+
+    projects = projects.filter((project) => !(targetProject === project));
+    todos = todos.filter((todo) => !toBeDeletedTodos.includes(todo));
+    e.target.closest('.sidebar__item').remove();
+  }
 }
+
+// Add project 
+const addProject = (e) => {
+  const addProjectInputText = document.getElementById('sidebar__addProject--text');
+  let newProjectTitle = addProjectInputText.value;
+  if (newProjectTitle) {
+    const newProjectObject = projectFactory(newProjectTitle);
+    projects.push(newProjectObject);
+    renderProject(newProjectObject);
+    addProjectInputText.value = '';
+  }
+}
+
 
 renderAllTodos(todos);
 renderAllProjects(projects);

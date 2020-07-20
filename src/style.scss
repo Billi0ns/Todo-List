@@ -200,7 +200,7 @@ input {
     width: 100%;
 } 
 
-.todo__deleteBtn {
+.deleteBtn {
     background: url(../dist/images/trash-icon.svg) no-repeat;
     background-size: contain;
     border: none;
@@ -214,9 +214,9 @@ input {
     margin-left: auto;
 }
 
-.todo:not(.expanded):hover  .todo__deleteBtn,
-.sidebar__item:hover .todo__deleteBtn,
-.todo__deleteBtn:hover {
+.todo:not(.expanded):hover  .deleteBtn,
+.sidebar__item:not(.selected-project):hover .deleteBtn,
+.deleteBtn:hover {
     transform: translateX(0);
     transition: .3s ease;
     opacity: 1;
