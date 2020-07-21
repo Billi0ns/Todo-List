@@ -1,6 +1,6 @@
 import "./style.scss";
 
-let globalTodoIndex = 6;
+let globalTodoIndex = 7;
 let globalProjectIndex = 4;
 
 let todos = [
@@ -29,7 +29,7 @@ let todos = [
     project: 'Get Started',
   },
   {
-    title: 'Delete by clicking on the trash icon',
+    title: 'View checked todos by clicking Logbook section',
     notes: '',
     checkedState: '',
     todoid: '4',
@@ -37,13 +37,22 @@ let todos = [
     project: 'Get Started',
   },
   {
-    title: 'Do the laundry',
+    title: 'Delete by clicking on the trash icon',
     notes: '',
     checkedState: '',
     todoid: '5',
     notesHeight: '40px',
+    project: 'Get Started',
+  },
+  {
+    title: 'Do the laundry',
+    notes: '',
+    checkedState: '',
+    todoid: '6',
+    notesHeight: '40px',
     project: 'Chores',
   },
+
 ]
 
 let projects = [
@@ -154,6 +163,10 @@ const addListenerToAddTodoBtn = () => {
     console.log(newTodoObject)
     todos.push(newTodoObject);
     renderTodo(newTodoObject);
+    setTimeout(()=>{ 
+      const newTodo = document.getElementById('todo-list').lastElementChild;
+      expandTodo(newTodo);
+    },50);
   })
 }
 
@@ -197,7 +210,7 @@ const renderTodo = (todo) => {
       <div class="todo__expand">
           <textarea class="todo__notes resize-ta" placeholder="Notes" data-todoid="${todo.todoid}" style="height: ${todo.notesHeight};">${todo.notes}</textarea>
       </div>
-  </div>`;
+  </div>`; 
   todoList.insertAdjacentHTML('beforeend', todoHTML);
 }
 
@@ -251,7 +264,7 @@ const calcHeight = (value) => {
 
 // Define actions when double click on todo (expand)
 const expandTodo = (e) => {
-  const target = e.target;
+  const target = e.target ? e.target : e;
   // If double click on checkbox or deleteBtn, don't expand todo
   const clickedCheckbox = target.classList.contains('todo__checkbox');
   const clickedDeleteBtn = target.classList.contains('deleteBtn');

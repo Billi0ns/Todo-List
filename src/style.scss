@@ -33,7 +33,7 @@ input {
 // Sidebar
 .sidebar {
     background: $secondary-color;
-    height: 100vh;
+    min-height: 100vh;
     padding: 2rem;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -114,7 +114,7 @@ input {
 // Todo-list
 .right-container {
     background: $primary-color;
-    height: 100vh;
+    min-height: 100vh;
     padding: 3rem 10rem;
 }
 
