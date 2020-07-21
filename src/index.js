@@ -1,46 +1,67 @@
 import "./style.scss";
 
-let globalTodoIndex = 4;
+let globalTodoIndex = 6;
 let globalProjectIndex = 4;
 
 let todos = [
   {
-    title: 'Buy milk on my way home',
-    notes: 'One litter of milk',
+    title: 'Welcome to this To-Do list app',
+    notes: '',
     checkedState: '',
     todoid: '1',
     notesHeight: '40px',
-    project: 'Default',
+    project: 'Get Started',
   },
   {
-    title: 'Drink milk',
-    notes: 'Drink a glass of milk',
-    checkedState: 'checked',
+    title: 'Double click to expand todo',
+    notes: 'Click outside current todo to collapse',
+    checkedState: '',
     todoid: '2',
     notesHeight: '40px',
-    project: 'Default',
+    project: 'Get Started',
   },
   {
-    title: 'Welcome to this To-Do list app',
+    title: 'Check off todo by clicking on the checkbox',
     notes: '',
     checkedState: '',
     todoid: '3',
     notesHeight: '40px',
-    project: 'Welcome',
-  }
+    project: 'Get Started',
+  },
+  {
+    title: 'Delete by clicking on the trash icon',
+    notes: '',
+    checkedState: '',
+    todoid: '4',
+    notesHeight: '40px',
+    project: 'Get Started',
+  },
+  {
+    title: 'Do the laundry',
+    notes: '',
+    checkedState: '',
+    todoid: '5',
+    notesHeight: '40px',
+    project: 'Chores',
+  },
 ]
 
 let projects = [
   {
-    title: 'Default',
-    projectid: '1',
-    selectState: 'selected-project',
+    title: 'All Tasks',
+    projectid: '0',
+    selectState: 'selected-project default',
   },
   {
-    title: 'Welcome',
+    title: 'Get Started',
+    projectid: '1',
+    selectState: '',
+  },
+  {
+    title: 'Chores',
     projectid: '2',
     selectState: '',
-  }
+  },
 ]
 
 
@@ -114,6 +135,7 @@ const addListenerToAddTodoBtn = () => {
   addTodoBtn.addEventListener('click', (e) => {
     globalTodoIndex += 1;
     const newTodoObject = todoFactory();
+    console.log(newTodoObject)
     todos.push(newTodoObject);
     renderTodo(newTodoObject);
   })
@@ -128,7 +150,7 @@ const todoFactory = () => ({
   checkedState: '',
   todoid: `${globalTodoIndex}`,
   notesHeight: '40px',
-  project: document.querySelector('.project-title').textContent,
+  project: document.getElementById('project-title').textContent,
 })
 
 const projectFactory = (projectTitle) => ({
@@ -276,7 +298,7 @@ const sidebarClickHandler = () => {
       deleteProject(e);
     } else if (target.classList.contains('sidebar__addProjectBtn')) {
       addProject(e);
-    }
+    } 
   })
 }
 
@@ -288,7 +310,11 @@ const setCurrentProject = (e) => {
   selectProject(e);
   document.getElementById('project-title').textContent = selectedProjectTitle;
   removeAllTodoListItems();
-  renderAllTodos(projectFilteredTodos);
+  if (e.target.classList.contains('default')) {
+    renderAllTodos(todos);
+  } else {
+    renderAllTodos(projectFilteredTodos);
+  }
 }
 
 const selectProject = (e) => {
