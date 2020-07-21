@@ -213,6 +213,7 @@ input {
     transform: translateX(2rem); 
     padding-right: 1.7rem;
     opacity: 0;
+    visibility: none;
     cursor: pointer;
     transition: .3s ease-out;
     margin-left: auto;
@@ -224,6 +225,7 @@ input {
     transform: translateX(0);
     transition: .3s ease;
     opacity: 1;
+    visibility: visible;
 }
 
 .todo__expand {

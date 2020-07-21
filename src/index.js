@@ -84,11 +84,16 @@ const todoListClickHandler = () => {
   const todoList = document.getElementById('todo-list');
   todoList.addEventListener('click', (e) => {
     const target = e.target;
-    if (target.classList.contains('todo__checkbox')) {
+    const projectTitle = document.getElementById('project-title').textContent;
+
+    if (target.classList.contains('todo__checkbox') && projectTitle === 'Logbook') {
+      toggleCheckedState(e);
+      logbookUncheck(e);
+    } else if (target.classList.contains('todo__checkbox')) {
       toggleCheckedState(e);
     } else if (target.classList.contains('deleteBtn')) {
       deleteTodo(e);
-    }
+    } 
   })
 }
 
@@ -138,6 +143,12 @@ const getTargetProject = (e) => {
 const addListenerToAddTodoBtn = () => {
   const addTodoBtn = document.querySelector('.addTodoBtn');
   addTodoBtn.addEventListener('click', (e) => {
+    const projectTitle = document.getElementById('project-title').textContent;
+    if (projectTitle === 'Logbook') {
+      alert('You cant add new todo under Logbook, please switch to other project');
+      return;
+    }
+
     globalTodoIndex += 1;
     const newTodoObject = todoFactory();
     console.log(newTodoObject)
@@ -296,20 +307,28 @@ const removeCheckedState =  (e) => {
   target.closest('.todo').classList.remove('checked')
 }
 
+const logbookUncheck = (e) => {
+  const currentTodo = e.target.closest('.todo');
+  currentTodo.remove();
+}
+
 // Set current project
 const sidebarClickHandler = () => {
   const sidebar = document.getElementById('sidebar__list');
   sidebar.addEventListener('click', (e) => {
     const target = e.target;
-    
-    if (target.classList.contains('deleteBtn')) {
+
+    if (target.closest('.selected-project')) return;
+
+    if (target.classList.contains('deleteBtn') && target.closest('.logbook')) {
+      deleteAllCheckedTodos();
+    } else if (target.classList.contains('deleteBtn')) {
       deleteProject(e);
     } else if (target.classList.contains('sidebar__addProjectBtn')) {
       addProject(e);
     } else if (target.closest('.sidebar__item') && !target.closest('.sidebar__addProject'))  {
       setCurrentProject(e);
     }
-    
   })
 }
 
@@ -329,9 +348,7 @@ const setCurrentProject = (e) => {
   if (e.target.closest('.default')) {
     const unCheckedTodos = todos.filter((todo) => todo.checkedState !== 'checked');
     renderAllTodos(unCheckedTodos);
-    //renderAllTodos(todos);
   } else if (e.target.closest(".logbook")) {
-    console.log('logbook');
     const checkedTodos = todos.filter((todo) => todo.checkedState === 'checked');
     renderAllTodos(checkedTodos);
   } else {
@@ -352,7 +369,6 @@ const selectProject = (e) => {
   previousSelectedTargetProject.selectState = ''; 
   target.classList.add('selected-project');
   targetProject.selectState = 'selected-project';
-  console.log(projects);
 }
 
 const removeAllTodoListItems = () => {
@@ -375,6 +391,12 @@ const deleteProject = (e) => {
   }
 }
 
+const deleteAllCheckedTodos = () => {
+  if (confirm('Are you sure you want to delete all checked todos?')) {
+    todos = todos.filter((todo) => todo.checkedState !== 'checked');
+  }
+}
+
 // Add project 
 const addProject = (e) => {
   const addProjectInputText = document.getElementById('sidebar__addProject--text');
@@ -391,3 +413,6 @@ const addProject = (e) => {
 renderAllTodos(todos);
 renderAllProjects(projects);
 initListeners();
+
+
+// TODO 3. Allow user to change the project for the todo
