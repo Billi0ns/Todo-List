@@ -69,7 +69,6 @@ input {
     display: flex;
 
     &:hover {
-        //background-color: rgb(38,66,114);
         background-color: rgba($color: #000000, $alpha: 0.2);
     }
 }
@@ -106,6 +105,10 @@ input {
     &:hover {
         background-color: #ff007652;
     }
+}
+
+.logbook {
+    margin-top: 3rem;
 }
 
 // Todo-list
@@ -216,8 +219,8 @@ input {
 }
 
 .todo:not(.expanded):hover  .deleteBtn,
-.sidebar__item:not(.selected-project):hover .deleteBtn,
-.deleteBtn:hover {
+.sidebar__item:not(.selected-project):not(.default):hover .deleteBtn,
+.todo__default:hover .deleteBtn:hover {
     transform: translateX(0);
     transition: .3s ease;
     opacity: 1;
@@ -273,4 +276,22 @@ input {
 .todo__title.checked {
     text-decoration: line-through;
     color: rgb(145, 147, 149);
+}
+
+.todo.checked {
+    animation: todo-fadeout .3s;
+    animation-fill-mode: forwards;
+    animation-delay: 1.3s;
+}
+
+@keyframes todo-fadeout {
+    from {
+        opacity: 1;
+        display: block;
+        height: 27px;
+    }
+    to {
+        opacity: 0;
+        height: 0;
+    }
 }
