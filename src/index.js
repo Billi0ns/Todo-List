@@ -86,6 +86,7 @@ const initListeners = () => {
   autoResizeNotes();
   addCollapseListenerToTodo();
   sidebarClickHandler();
+  addListenerToSidebarBtn();
 }
 
 // To-Do list event delegation
@@ -422,10 +423,35 @@ const addProject = (e) => {
   }
 }
 
+// Sidebar collapse
+const addListenerToSidebarBtn = () => {
+  const sidebarBtn = document.getElementById('sidebarCollapseBtn');
+  sidebarBtn.addEventListener('click', toggleSidebar);
+}
+
+const toggleSidebar = (e) => {
+  const collapsedState = e.target.classList.contains('collapsed');
+  collapsedState ? removeCollapsedState(e) : addCollapsedState(e);
+}
+
+const addCollapsedState = (e) => {
+  e.target.classList.add('collapsed')
+  document.getElementById('container').classList.add('collapsed');
+}
+
+const removeCollapsedState = (e) => {
+  e.target.classList.remove('collapsed')
+  document.getElementById('container').classList.remove('collapsed');
+}
+
 
 renderAllTodos(todos);
 renderAllProjects(projects);
 initListeners();
 
 
-// TODO 3. Allow user to change the project for the todo
+
+// TODO 1. Add date?
+// TODO 2. Implement localstorage
+// TODO 3. Maybe allow user to delete project even when selected?
+// TODO 4. Allow user to change the project for the todo

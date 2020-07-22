@@ -30,7 +30,12 @@ input {
     grid-template-columns: 25rem 1fr;
 }
 
+
 // Sidebar
+#sidebarCollapseBtn {
+    cursor: pointer;
+}
+
 .sidebar {
     background: $secondary-color;
     min-height: 100vh;
@@ -48,8 +53,7 @@ input {
 
     & > div {
         margin-left: 1rem;
-    }
-    
+    }    
 }
 
 .sidebar__list {
@@ -109,6 +113,17 @@ input {
 
 .logbook {
     margin-top: 3rem;
+}
+
+// Sidebar collapsed state
+.container.collapsed {
+    grid-template-columns: 7rem 1fr;
+    //animation: sidebarSlide 2s ;
+}
+
+.container.collapsed .sidebar__title,
+.container.collapsed .sidebar__list {
+    display: none;
 }
 
 // Todo-list
