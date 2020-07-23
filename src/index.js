@@ -1,7 +1,18 @@
 import "./style.scss";
 
+// Setup localStorage variables
 let globalTodoIndex = 7;
 let globalProjectIndex = 4;
+
+if (localStorage.getItem('globalTodoIndex')) {
+  globalTodoIndex = JSON.parse(localStorage.getItem('globalTodoIndex'));
+}
+localStorage.setItem('globalTodoIndex', JSON.stringify(globalTodoIndex));
+
+if (localStorage.getItem('globalProjectIndex')) {
+  globalProjectIndex = JSON.parse(localStorage.getItem('globalProjectIndex'));
+}
+localStorage.setItem('globalProjectIndex', JSON.stringify(globalProjectIndex));
 
 let todos = [
   {
@@ -78,13 +89,25 @@ let projects = [
   }
 ]
 
+if (localStorage.getItem('todosRef')) {
+  todos = JSON.parse(localStorage.getItem('todosRef'));
+} 
+localStorage.setItem('todosRef', JSON.stringify(todos));
 
+
+if (localStorage.getItem('projectsRef')) {
+  projects = JSON.parse(localStorage.getItem('projectsRef'));
+} 
+localStorage.setItem('projectsRef', JSON.stringify(projects));
+
+// Initialize listeners
 const initListeners = () => {
   todoListClickHandler();
   todoListDoubleClickHandler();
   todoListInputHandler();
   autoResizeNotes();
   addCollapseListenerToTodo();
+  addListenerToAddTodoBtn();
   sidebarClickHandler();
   addListenerToSidebarBtn();
 }
@@ -104,6 +127,7 @@ const todoListClickHandler = () => {
     } else if (target.classList.contains('deleteBtn')) {
       deleteTodo(e);
     } 
+    localStorage.setItem('todosRef', JSON.stringify(todos));
   })
 }
 
@@ -128,6 +152,7 @@ const todoListInputHandler = () => {
     } else if (target.classList.contains('todo__notes')) {
       targetTodo.notes = target.value;
     }
+    localStorage.setItem('todosRef', JSON.stringify(todos));
   })
 }
 
@@ -155,23 +180,23 @@ const addListenerToAddTodoBtn = () => {
   addTodoBtn.addEventListener('click', (e) => {
     const projectTitle = document.getElementById('project-title').textContent;
     if (projectTitle === 'Logbook') {
-      alert('You cant add new todo under Logbook, please switch to other project');
+      alert("You can't add new todo under Logbook\nPlease switch to other project");
       return;
     }
 
-    globalTodoIndex += 1;
     const newTodoObject = todoFactory();
-    console.log(newTodoObject)
+    globalTodoIndex += 1;
     todos.push(newTodoObject);
     renderTodo(newTodoObject);
     setTimeout(()=>{ 
       const newTodo = document.getElementById('todo-list').lastElementChild;
       expandTodo(newTodo);
     },50);
+
+    localStorage.setItem('todosRef', JSON.stringify(todos));
+    localStorage.setItem('globalTodoIndex', JSON.stringify(globalTodoIndex));
   })
 }
-
-addListenerToAddTodoBtn();
 
 // Factories
 const todoFactory = () => ({
@@ -195,7 +220,6 @@ const deleteTodo = (e) => {
   const toBeDeleted = e.target.closest('.todo');
   toBeDeleted.remove();
   todos.splice(todos.indexOf(targetTodo), 1);
-  console.log(todos)
 }
 
 // Render To-Do
@@ -212,6 +236,7 @@ const renderTodo = (todo) => {
           <textarea class="todo__notes resize-ta" placeholder="Notes" data-todoid="${todo.todoid}" style="height: ${todo.notesHeight};">${todo.notes}</textarea>
       </div>
   </div>`; 
+  
   todoList.insertAdjacentHTML('beforeend', todoHTML);
 }
 
@@ -252,6 +277,7 @@ const autoResizeNotes = () => {
 
       targetTodo.notesHeight = notesHeight;
       e.target.style.height = notesHeight;
+      localStorage.setItem('todosRef', JSON.stringify(todos));
     }
   })
 };
@@ -286,9 +312,7 @@ const addCollapseListenerToTodo = () => {
     if (clickedOutsideTodo) {
       document.querySelector('.todo.expanded .todo__title').setAttribute('readonly', 'true');
       const expandedClass = Array.from(document.querySelectorAll('.expanded'));
-      expandedClass.map(x => {
-        x.classList.remove('expanded');
-      })
+      expandedClass.map(x => x.classList.remove('expanded'));
     }
   });
 }
@@ -343,6 +367,9 @@ const sidebarClickHandler = () => {
     } else if (target.closest('.sidebar__item') && !target.closest('.sidebar__addProject'))  {
       setCurrentProject(e);
     }
+
+    localStorage.setItem('todosRef', JSON.stringify(todos));
+    localStorage.setItem('projectsRef', JSON.stringify(projects));
   })
 }
 
@@ -353,9 +380,8 @@ const setCurrentProject = (e) => {
   } else {
     selectedProjectTitle = e.target.textContent;
   }
-  const projectFilteredTodos = filterProjectTodos(selectedProjectTitle);
   
-
+  const projectFilteredTodos = filterProjectTodos(selectedProjectTitle);
   selectProject(e);
   document.getElementById('project-title').textContent = selectedProjectTitle;
   removeAllTodoListItems();
@@ -372,17 +398,12 @@ const setCurrentProject = (e) => {
 
 const selectProject = (e) => {
   const target = e.target.closest('.sidebar__item');
-  const targetProject = getTargetProject(e);
   const previousSelectedProject = document.querySelector('.selected-project');
-  const previousSelectedTargetProject = getTargetProject(previousSelectedProject);
-  //const allTasksProject = projects.find((project) => project.projectid === 0);
   
   if (target === previousSelectedProject) return;
   
   previousSelectedProject.classList.remove('selected-project');
-  previousSelectedTargetProject.selectState = ''; 
   target.classList.add('selected-project');
-  targetProject.selectState = 'selected-project';
 }
 
 const removeAllTodoListItems = () => {
@@ -415,11 +436,15 @@ const deleteAllCheckedTodos = () => {
 const addProject = (e) => {
   const addProjectInputText = document.getElementById('sidebar__addProject--text');
   let newProjectTitle = addProjectInputText.value;
+
   if (newProjectTitle) {
     const newProjectObject = projectFactory(newProjectTitle);
+    globalProjectIndex += 1;
     projects.push(newProjectObject);
     renderProject(newProjectObject);
     addProjectInputText.value = '';
+
+    localStorage.setItem('globalProjectIndex', JSON.stringify(globalProjectIndex));
   }
 }
 
@@ -445,13 +470,7 @@ const removeCollapsedState = (e) => {
 }
 
 
-renderAllTodos(todos);
+const unCheckedTodos = todos.filter((todo) => todo.checkedState !== 'checked');
+renderAllTodos(unCheckedTodos);
 renderAllProjects(projects);
 initListeners();
-
-
-
-// TODO 1. Add date?
-// TODO 2. Implement localstorage
-// TODO 3. Maybe allow user to delete project even when selected?
-// TODO 4. Allow user to change the project for the todo
